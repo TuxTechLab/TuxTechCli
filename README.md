@@ -26,6 +26,11 @@ TuxTech CLI is a powerful command-line interface designed for managing Software-
 ## 📦 Installation
 
 ### Prerequisites
+
+- Git
+- GPG
+- Linux
+- Ansible
 - Python 3.8+
 
 ### Using pip
@@ -58,28 +63,61 @@ ttcli --help
 
 ```bash
 TuxTechCli/
-├── .github/            # GitHub workflows and templates
-├── docs/               # Documentation
-├── examples/           # Example configurations
-├── src/                # Source code
-│   ├── core/           # Core functionality
-│   ├── infra/          # Infrastructure management
-│   ├── scripts/        # Helper scripts
-│   ├── tests/          # Test suite
-│   └── utils/          # Utility functions
-├── .gitignore          # Git ignore rules
-├── docker-compose.yml  # Docker configuration
-├── pyproject.toml      # Project metadata
-├── README.md           # This file
-└── setup.py            # Package installation
+├── .github/                          # GitHub workflows and contribution guidelines
+│   ├── workflows/                    # GitHub Actions workflows
+│   │   ├── ci.yml                    # Continuous Integration
+│   │   ├── pr.yml                    # Pull Request checks
+│   │   └── release.yml               # Release automation
+│   ├── CODE_OF_CONDUCT.md            # Community guidelines
+│   ├── CONTRIBUTING.md               # Contribution guidelines
+│   └── FUNDING.md                    # Project funding information
+│
+├── docs/                             # Documentation
+│   ├── architecture.md               # System architecture
+│   ├── commands.md                   # Command reference
+│   ├── home.md                       # Documentation homepage
+│   ├── installation.md               # Installation guide
+│   └── troubleshooting.md            # Common issues and solutions
+│
+├── examples/                         # Example configurations and use cases
+│   └── logs/                         # Log file examples
+│
+├── src/                              # Source code
+│   ├── core/                         # Core functionality
+│   │   ├── GPG-KeyManager.py         # GPG key management
+│   │   └── gpg_key_manager_core.py   # Core GPG operations
+│   │
+│   ├── infra/                        # Infrastructure management
+│   │   └── __init__.py
+│   │
+│   ├── scripts/                      # Helper scripts
+│   │   ├── colors.sh                 # Terminal color definitions
+│   │   ├── ttl-motd                  # Message of the day
+│   │   └── tuxtechlab_shell-setup.sh # Shell setup
+│   │
+│   ├── tests/                        # Test suite
+│   │   └── __init__.py
+│   │
+│   ├── utils/                        # Utility functions
+│   │   └── __init__.py
+│   │
+│   └── validations/                  # Input validation
+│
+├── LICENSE                           # MIT License
+├── Makefile                          # Common tasks and automation
+├── README.md                         # This file
+├── requirements.txt                  # Python dependencies
+├── setup.cfg                         # Package configuration
+└── setup.py                          # Package installation and distribution
 ```
 
 ### 🤝 Contributing
 
+Kindly follow [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to contribute to this project.
 
 ### 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ### 📬 Contact
 For support or questions, please open an issue or contact the maintainers.
@@ -89,7 +127,9 @@ For support or questions, please open an issue or contact the maintainers.
 Built with ❤️ by [**TuxTechLab**](https://github.com/TuxTechLab)
 
 ```bash
-Would you like to make any adjustments to this README? For example:
+Would you like to make any adjustments to this README? 
+
+For example:
 
 1. Add more detailed installation instructions
 2. Include specific examples for different use cases
@@ -97,5 +137,5 @@ Would you like to make any adjustments to this README? For example:
 4. Include screenshots or diagrams
 5. Add a development setup section
 
-Let us know what additional information you'd like to include! via a new PR.
+Let us know what additional information you would like to include! via a new PR.
 ```
