@@ -1,8 +1,21 @@
-# Personal Zsh configuration file. It is strongly recommended to keep all
-# shell customization and configuration (including exported environment
-# variables such as PATH) in this file or in files sourced from it.
+# ==============================================================================
+# TuxTechLab Zsh Configuration
+# ==============================================================================
 #
-# Documentation: https://github.com/romkatv/zsh4humans/blob/v5/README.md.
+# This is a custom zsh configuration file that works with zsh4humans.
+# It's automatically managed by the TuxTechLab setup script.
+#
+# To customize your shell, you can:
+# 1. Edit this file directly
+# 2. Create a ~/.zshrc.local file for personal customizations
+# 3. Add files to ~/.zsh/ directory and source them from here
+#
+# Documentation: https://github.com/romkatv/zsh4humans/blob/v5/README.md
+# ==============================================================================
+
+# Start zprof for profiling zsh startup time
+# Uncomment to enable:
+# zmodload zsh/zprof
 
 # Periodic auto-update on Zsh startup: 'ask' or 'no'.
 # You can manually run `z4h update` to update everything.
@@ -147,11 +160,168 @@ alias tree='tree -a -I .git'
 
 
 # Add flags to existing aliases.
+# Add -A to ls alias to show hidden files (except . and ..)
 alias ls="${aliases[ls]:-ls} -A"
 
-# Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
-setopt glob_dots     # no special treatment for file names with a leading dot
-setopt no_auto_menu  # require an extra TAB press to open the completion menu
+# ==============================================================================
+# Zsh Options
+# ==============================================================================
+# Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html
+setopt glob_dots           # no special treatment for file names with a leading dot
+setopt no_auto_menu        # require an extra TAB press to open the completion menu
+setopt auto_cd             # cd by typing directory name if it's not a command
+setopt extended_glob       # use extended globbing features
+setopt interactive_comments # allow comments in interactive shell
+setopt no_beep             # don't beep on error
+setopt no_case_glob        # case-insensitive globbing
+setopt numeric_glob_sort   # sort filenames numerically when it makes sense
+
+# History settings
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt append_history       # append to history file instead of overwriting
+setopt extended_history     # save timestamp and duration to history
+setopt hist_expire_dups_first # expire duplicate entries first
+setopt hist_ignore_dups     # don't store duplicate entries
+setopt hist_ignore_space    # don't store commands starting with space
+setopt hist_verify          # show command with history expansion to user before running it
+setopt share_history        # share history between terminal sessions
+
+# ==============================================================================
+# Environment Variables
+# ==============================================================================
+# Set default editor
+if command -v nvim >/dev/null 2>&1; then
+    export EDITOR='nvim'
+elif command -v vim >/dev/null 2>&1; then
+    export EDITOR='vim'
+else
+    export EDITOR='vi'
+fi
+
+# Set pager
+if command -v bat >/dev/null 2>&1; then
+    export PAGER='bat --paging=always --style=plain'
+    export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+    export MANROFFOPT="-c"
+else
+    export PAGER='less -RFX'
+fi
+
+# Add ~/bin to PATH if it exists
+[ -d "$HOME/bin" ] && export PATH="$HOME/bin:$PATH"
+
+# Add ~/.local/bin to PATH if it exists
+[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
+
+# ==============================================================================
+# Aliases
+# ==============================================================================
+# Enable color support for various commands
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# Common aliases
+alias ll='ls -alFh'
+alias la='ls -A'
+alias l='ls -CF'
+alias c='clear'
+alias h='history'
+alias j='jobs -l'
+alias path='echo -e ${PATH//:/\n}'
+alias now='date +"%T"'
+alias nowtime='now'
+alias nowdate='date +"%d-%m-%Y"'
+
+# Git aliases
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit -v'
+alias gcm='git commit -m'
+alias gco='git checkout'
+alias gd='git diff'
+alias gl='git pull'
+alias gp='git push'
+alias grh='git reset --hard'
+alias gst='git status'
+
+# Safety features
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# ==============================================================================
+# Functions
+# ==============================================================================
+# Create a new directory and enter it
+mkd() {
+    mkdir -p "$@" && cd "${@: -1}" || return
+}
+
+# Change working directory to the top-most Finder window location
+cdf() { # short for `cdfinder`
+    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)' 2>/dev/null)" || return
+}
+
+# Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
+targz() {
+    local tmpFile="${1%/}.tar"
+    tar -cvf "${tmpFile}" --exclude=".DS_Store" "${1}" || return 1
+    
+    size=$(
+        stat -f"%z" "${tmpFile}" 2>/dev/null || # macOS `stat`
+        stat -c"%s" "${tmpFile}"              # GNU `stat`
+    )
+    
+    local cmd=""
+    if (( size < 52428800 )) && hash zopfli 2>/dev/null; then
+        # the .tar file is smaller than 50 MB and Zopfli is available
+        cmd="zopfli"
+    else
+        if hash pigz 2>/dev/null; then
+            cmd="pigz"
+        else
+            cmd="gzip"
+        fi
+    fi
+    
+    echo "Compressing .tar using ${cmd}…"
+    "${cmd}" -v "${tmpFile}" || return 1
+    [ -f "${tmpFile}" ] && rm "${tmpFile}"
+    echo "${tmpFile}.gz created successfully."
+}
+
+# ==============================================================================
+# Load local configuration
+# ==============================================================================
+# Source local zsh config if it exists
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+
+# Source zsh-syntax-highlighting if it exists
+if [ -f ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+# Source zsh-autosuggestions if it exists
+if [ -f ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+    source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+    # Enable async autosuggestions
+    ZSH_AUTOSUGGEST_USE_ASYNC=1
+fi
+
+# ==============================================================================
+# Finalize
+# ==============================================================================
+# End zprof if it was started
+if (($+zprof)); then
+    zprof
+fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm

@@ -1,10 +1,29 @@
-# TuxTech CLI - SDDC Management Toolkit
+# TuxTechCli - HomeLab SDDC Management Toolkit
 
-[![CI Status](https://github.com/TuxTechLab/TuxTechCli/actions/workflows/ci.yml/badge.svg)](https://github.com/TuxTechLab/TuxTechCli/actions/workflows/ci.yml)
+<!-- [![CI Status](https://github.com/TuxTechLab/TuxTechCli/actions/workflows/ci.yml/badge.svg)](https://github.com/TuxTechLab/TuxTechCli/actions/workflows/ci.yml)
 [![PyPI Version](https://img.shields.io/pypi/v/tuxtech-cli)](https://pypi.org/project/tuxtech-cli/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) -->
 
-TuxTech CLI is a powerful command-line interface designed for managing Software-Defined Data Centers (SDDC) in homelab environments and small business deployments. It provides a comprehensive set of tools for automating and managing your infrastructure.
+TuxTechCli is a powerful command-line interface designed for managing Software-Defined Data Centers (SDDC) in homelab environments and small business deployments. It provides a comprehensive set of tools for automating and managing your infrastructure.
+
+## 📥 Installation
+
+### Clone the Repository
+
+```bash
+# Clone the repository
+git clone https://github.com/TuxTechLab/TuxTechCli.git
+cd TuxTechCli
+```
+
+### Install Shell Dependencies
+
+```bash
+# Set up the shell environment
+sudo bash src/scripts/setup.sh
+```
+
+> **Note**: _The setup script will configure your shell environment and install necessary dependencies. You may need to restart your shell or log out and back in for all changes to take effect._
 
 ## 🚀 Features
 
@@ -36,10 +55,12 @@ TuxTech CLI is a powerful command-line interface designed for managing Software-
 ### Using pip
 
 ```bash
-pip install tuxtech-cli
 git clone https://github.com/TuxTechLab/TuxTechCli.git
+
 cd TuxTechCli
-pip install -e .
+
+# Setup the Cli
+sudo bash src/scripts/setup.sh
 
 # Initialize the CLI
 ttcli init
@@ -110,18 +131,6 @@ TuxTechCli/
 ├── setup.cfg                         # Package configuration
 └── setup.py                          # Package installation and distribution
 ```
-
-### 🤝 Contributing
-
-Kindly follow [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to contribute to this project.
-
-### 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
-### 📬 Contact
-For support or questions, please open an issue or contact the maintainers.
-
 ---
 
 Built with ❤️ by [**TuxTechLab**](https://github.com/TuxTechLab)
