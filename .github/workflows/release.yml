@@ -1,0 +1,32 @@
+name: TuxTechCli Releases Automation GitHub Action
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## Changes
+            
+            $(git log --pretty=format:'- %s' ${{ github.event.before }}..${{ github.sha }})
+            
+            ## Build Details
+            
+            - Commit: ${{ github.sha }}
+            - Branch: ${{ github.ref }}
+            - Workflow: ${{ github.workflow }}
+          draft: false
+          prerelease: false
