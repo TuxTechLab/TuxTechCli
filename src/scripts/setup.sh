@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Global auto-confirm flag
+AUTO_CONFIRM=false
+
 # Set colors for output
 RED="\e[31m"
 GREEN="\e[32m"
@@ -56,20 +59,31 @@ install_snap_package() {
 
 # Function to get user confirmation
 confirm_install() {
-    local description="$1"
-    local default_answer="$2"
+    local message="$1"
+    local default_choice="$2"
+    
+    # If auto-confirm is enabled, return true
+    if [ "$AUTO_CONFIRM" = true ]; then
+        echo -e "${BLUE}[*] Auto-confirming: $message${RESET}"
+        return 0
+    fi
     
     while true; do
-        read -p "Install $description? (y/N): " yn
-        case $yn in
-            [Yy]* ) return 0;;
-            [Nn]* ) return 1;;
-            * ) if [ "$default_answer" = "y" ]; then
-                   return 0
-               else
-                   return 1
-               fi;;
-        esac
+        if [ "$default_choice" = "y" ]; then
+            read -p "$message [Y/n] " yn
+            case $yn in
+                [Yy]* | '' ) return 0;;
+                [Nn]* ) return 1;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        else
+            read -p "$message [y/N] " yn
+            case $yn in
+                [Yy]* ) return 0;;
+                [Nn]* | '' ) return 1;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        fi
     done
 }
 
@@ -84,10 +98,10 @@ install_ssh() {
 
 # Function to install text editors
 install_editors() {
-    if confirm_install "Text editors (nano, vim, neovim)" "y"; then
+    if confirm_install "Text editors (nano, vim)" "y"; then
         echo -e "\n${BLUE}[*] Installing text editors...${RESET}"
         install_package "nano vim" "Text editors (nano and vim)"
-        install_package "neovim" "Advanced text editor"
+        # nstall_package "neovim" "Advanced itext editor"
     fi
 }
 
@@ -107,12 +121,12 @@ install_network_tools() {
 
 # Function to install monitoring and analysis tools
 install_monitoring_tools() {
-    if confirm_install "Monitoring tools (htop, iotop, nethogs, etc.)" "y"; then
+    if confirm_install "Monitoring tools ( nmap, wireshark, tshark, termshark)" "y"; then
         echo -e "\n${BLUE}[*] Installing monitoring tools...${RESET}"
-        install_package "htop" "Interactive process viewer"
-        install_package "iotop" "IO usage monitor"
-        install_package "iftop" "Network bandwidth monitor"
-        install_package "nethogs" "Per-process bandwidth monitor"
+        # install_package "htop" "Interactive process viewer"
+        # install_package "iotop" "IO usage monitor"
+        # install_package "iftop" "Network bandwidth monitor"
+        # install_package "nethogs" "Per-process bandwidth monitor"
         install_package "nmap" "Network scanning tool"
         install_package "wireshark" "Network protocol analyzer"
         install_package "tshark" "Command-line network analyzer"
@@ -135,17 +149,17 @@ install_dev_tools() {
 
 # Function to install additional utilities
 install_utilities() {
-    if confirm_install "Additional utilities (tree, fzf, ripgrep, etc.)" "y"; then
+    if confirm_install "Additional utilities (tree, jq, etc.)" "y"; then
         echo -e "\n${BLUE}[*] Installing additional utilities...${RESET}"
         install_package "tree" "Directory tree viewer"
-        install_package "lynx" "Text-based web browser"
+        # install_package "lynx" "Text-based web browser"
         install_package "jq" "JSON processor"
-        install_package "fzf" "Fuzzy finder"
-        install_package "ripgrep" "Fast text search"
-        install_package "fd-find" "Smart file finder"
-        install_package "bat" "Cat with syntax highlighting"
-        install_package "exa" "Modern ls replacement"
-        install_package "zellij" "Terminal workspace manager"
+        # install_package "fzf" "Fuzzy finder"
+        # install_package "ripgrep" "Fast text search"
+        # install_package "fd-find" "Smart file finder"
+        # install_package "bat" "Cat with syntax highlighting"
+        # install_package "exa" "Modern ls replacement"
+        # install_package "zellij" "Terminal workspace manager"
     fi
 }
 
@@ -162,44 +176,76 @@ install_python_packages() {
 }
 
 # Function to install snap packages
-install_snap_packages() {
-    if command_exists snap && confirm_install "Snap packages (Postman, Insomnia, DBeaver)" "y"; then
-        echo -e "\n${BLUE}[*] Installing snap packages...${RESET}"
-        install_snap_package "postman" "API development environment"
-        install_snap_package "insomnia" "Alternative API client"
-        install_snap_package "dbeaver-ce" "Database management tool"
-    fi
-}
+# install_snap_packages() {
+#     if command_exists snap && confirm_install "Snap packages (Postman, Insomnia, DBeaver)" "y"; then
+#         echo -e "\n${BLUE}[*] Installing snap packages...${RESET}"
+#         install_snap_package "postman" "API development environment"
+#         install_snap_package "insomnia" "Alternative API client"
+#         install_snap_package "dbeaver-ce" "Database management tool"
+#     fi
+# }
 
 # Function to install GPG Key Manager
-install_gpg_key_manager() {
-    if confirm_install "GPG Key Manager (from local repo)" "y"; then
-        echo -e "\n${BLUE}[*] Installing GPG Key Manager...${RESET}"
-        # Install from local repository
-        cd $(dirname "$0")
-        if [ -f "setup.py" ]; then
-            python3 setup.py install
-            echo -e "${GREEN}[✓] GPG Key Manager installed successfully${RESET}"
-        else
-            echo -e "${RED}[✗] Could not find setup.py in the repository${RESET}"
-            echo -e "${YELLOW}[*] Skipping GPG Key Manager installation${RESET}"
-        fi
-    fi
-}
+# install_gpg_key_manager() {
+#     if confirm_install "GPG Key Manager (from local repo)" "y"; then
+#         echo -e "\n${BLUE}[*] Installing GPG Key Manager...${RESET}"
+#         # Install from local repository
+#         cd $(dirname "$0")
+#         if [ -f "setup.py" ]; then
+#             python3 setup.py install
+#             echo -e "${GREEN}[✓] GPG Key Manager installed successfully${RESET}"
+#         else
+#             echo -e "${RED}[✗] Could not find setup.py in the repository${RESET}"
+#             echo -e "${YELLOW}[*] Skipping GPG Key Manager installation${RESET}"
+#         fi
+#     fi
+# }
 
 # Function to configure shell
 configure_shell() {
-    if confirm_install "Shell configuration (aliases and settings)" "y"; then
+    if confirm_install "Shell configuration (zsh4humans and custom settings)" "y"; then
         echo -e "\n${BLUE}[*] Configuring shell...${RESET}"
-        if [ ! -f "$HOME/.bash_aliases" ]; then
-            touch "$HOME/.bash_aliases"
-            echo "# TuxTechLab Aliases" >> "$HOME/.bash_aliases"
-            echo "alias ll='exa -l --git'" >> "$HOME/.bash_aliases"
-            echo "alias grep='grep --color=auto'" >> "$HOME/.bash_aliases"
-            echo "alias ls='exa --color=always'" >> "$HOME/.bash_aliases"
-            echo "alias cat='bat'" >> "$HOME/.bash_aliases"
-            echo "alias vi='nvim'" >> "$HOME/.bash_aliases"
+        
+        # Install zsh if not already installed
+        if ! command_exists zsh; then
+            echo -e "${BLUE}[*] Installing zsh...${RESET}"
+            sudo apt-get install -y zsh
         fi
+        
+        # Install zsh4humans
+        echo -e "${BLUE}[*] Installing zsh4humans...${RESET}"
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/romkatv/zsh4humans/v5/install)" || {
+            echo -e "${RED}[✗] Failed to install zsh4humans${RESET}"
+            return 1
+        }
+        
+        # Install custom zshrc
+        echo -e "${BLUE}[*] Setting up custom zsh configuration...${RESET}"
+        local ZSHRC_PATH="$HOME/.zshrc"
+        
+        # Backup existing .zshrc if it exists
+        if [ -f "$ZSHRC_PATH" ]; then
+            echo -e "${YELLOW}[!] Backing up existing .zshrc to ${ZSHRC_PATH}.bak${RESET}"
+            cp "$ZSHRC_PATH" "${ZSHRC_PATH}.bak"
+        fi
+        
+        # Copy custom zshrc
+        if [ -f "$(dirname "$0")/custom.zshrc" ]; then
+            cp "$(dirname "$0")/custom.zshrc" "$ZSHRC_PATH"
+            echo -e "${GREEN}[✓] Custom zsh configuration installed${RESET}"
+        else
+            echo -e "${YELLOW}[!] custom.zshrc not found in script directory${RESET}"
+        fi
+        
+        # Set zsh as default shell if not already
+        if [ "$SHELL" != "$(which zsh)" ]; then
+            echo -e "${BLUE}[*] Setting zsh as default shell...${RESET}"
+            chsh -s "$(which zsh)" "$USER"
+            echo -e "${GREEN}[✓] Default shell changed to zsh. Please log out and back in for changes to take effect.${RESET}
+"
+        fi
+        
+        echo -e "${GREEN}[✓] Shell configuration completed successfully${RESET}"
     fi
 }
 
@@ -210,6 +256,27 @@ main() {
         echo -e "${RED}[✗] Please run this script with sudo privileges${RESET}"
         exit 1
     fi
+    
+    # Ask for auto-confirm preference
+    echo -e "${YELLOW}=== TuxTechLab Setup Script ===${RESET}"
+    echo -e "${YELLOW}This script will install and configure various tools and settings.${RESET}"
+    
+    while true; do
+        read -p "Do you want to auto-confirm all installation prompts? [y/N] " yn
+        case $yn in
+            [Yy]* ) 
+                AUTO_CONFIRM=true
+                echo -e "${GREEN}[*] Auto-confirm enabled. All installations will proceed automatically.${RESET}"
+                break;;
+            [Nn]* | '' ) 
+                AUTO_CONFIRM=false
+                echo -e "${YELLOW}[*] Auto-confirm disabled. You will be prompted for each installation.${RESET}"
+                break;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+    
+    echo -e "\n${BLUE}Starting setup process...${RESET}"
 
     echo -e "${BLUE}[*] TuxTechLab Shell Setup Script${RESET}"
     echo -e "${BLUE}[*] Starting system update and upgrade...${RESET}"
@@ -255,20 +322,20 @@ main() {
     install_python_packages
     
     # Install snap packages
-    install_snap_packages
+    # install_snap_packages
     
     # Install GPG Key Manager
-    install_gpg_key_manager
+    # install_gpg_key_manager
     
     # Configure shell
     configure_shell
 
     # Update MOTD
     if [ -f "/etc/motd" ]; then
-        echo "" > /etc/motd
+        echo 'ttl-motd' > /etc/motd
     fi
 
-    echo -e "${GREEN}\n[✓] Setup completed successfully!${RESET}"
+    echo -e "${GREEN}\n[✓] TuxTechLab Linux CLI Setup completed successfully!${RESET}"
     echo -e "${BLUE}[*] Please log out and back in for all changes to take effect.${RESET}"
 }
 
